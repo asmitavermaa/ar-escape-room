@@ -11,13 +11,20 @@ function App() {
   const [gameState, setGameState] = useState<GameState>('intro');
   const [puzzleIdx, setPuzzleIdx] = useState(0);
   const [status, setStatus] = useState<'scanning' | 'active' | 'warning'>('scanning');
+  const [accessMode, setAccessMode] = useState(true);
+  const [scores, setScores] = useState<number[]>([]);
+  const [totalHints, setTotalHints] = useState(0);
 
   const handleStart = useCallback(() => {
     setPuzzleIdx(0);
+    setScores([]);
+    setTotalHints(0);
     setGameState('playing');
   }, []);
 
-  const handlePuzzleSolved = useCallback(() => {
+  const handlePuzzleSolved = useCallback((points: number, hintsUsed: number) => {
+    setScores(prev => [...prev, points]);
+    setTotalHints(prev => prev + hintsUsed);
     if (puzzleIdx >= PUZZLES.length - 1) {
       setGameState('victory');
     } else {
@@ -27,15 +34,15 @@ function App() {
 
   const handleRestart = useCallback(() => {
     setPuzzleIdx(0);
+    setScores([]);
+    setTotalHints(0);
     setGameState('intro');
   }, []);
 
-  if (gameState === 'intro') {
-    return <IntroScreen onStart={handleStart} />;
-  }
+  if (gameState === 'intro') return <IntroScreen onStart={handleStart} />;
 
   if (gameState === 'victory') {
-    return <VictoryScreen onRestart={handleRestart} />;
+    return <VictoryScreen scores={scores} totalHints={totalHints} onRestart={handleRestart} />;
   }
 
   return (
@@ -44,11 +51,14 @@ function App() {
         status={status}
         puzzle={PUZZLES[puzzleIdx]}
         totalPuzzles={PUZZLES.length}
+        accessMode={accessMode}
+        onToggleAccess={() => setAccessMode(m => !m)}
       />
       <ARScene
         puzzleIdx={puzzleIdx}
         onPuzzleSolved={handlePuzzleSolved}
         setStatus={setStatus}
+        accessMode={accessMode}
       />
     </div>
   );

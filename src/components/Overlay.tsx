@@ -5,9 +5,11 @@ interface OverlayProps {
   status: 'scanning' | 'active' | 'warning';
   puzzle: Puzzle;
   totalPuzzles: number;
+  accessMode: boolean;
+  onToggleAccess: () => void;
 }
 
-const Overlay: React.FC<OverlayProps> = ({ status, puzzle, totalPuzzles }) => {
+const Overlay: React.FC<OverlayProps> = ({ status, puzzle, totalPuzzles, accessMode, onToggleAccess }) => {
   const puzzleNum = puzzle.id;
 
   const statusColor =
@@ -49,31 +51,38 @@ const Overlay: React.FC<OverlayProps> = ({ status, puzzle, totalPuzzles }) => {
           </span>
         </div>
 
-        {/* Status pill */}
-        <div
-          style={{
-            background: 'rgba(0,0,0,0.75)',
-            border: `1.5px solid ${statusColor}`,
-            borderRadius: '20px',
-            padding: '6px 12px',
-            backdropFilter: 'blur(8px)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-          }}
-        >
-          <div
+        {/* Right side: access toggle + status */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, pointerEvents: 'auto' }}>
+          {/* Accessibility guide toggle */}
+          <button
+            onClick={onToggleAccess}
             style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: statusColor,
-              boxShadow: `0 0 6px ${statusColor}`,
+              background: accessMode ? 'rgba(0,229,255,0.18)' : 'rgba(0,0,0,0.6)',
+              border: `1.5px solid ${accessMode ? '#00e5ff' : 'rgba(255,255,255,0.25)'}`,
+              borderRadius: '20px', padding: '5px 11px',
+              backdropFilter: 'blur(8px)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 5,
             }}
-          />
-          <span style={{ color: statusColor, fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em' }}>
-            {statusLabel}
-          </span>
+          >
+            <span style={{ fontSize: '0.85rem' }}>👁</span>
+            <span style={{
+              color: accessMode ? '#00e5ff' : 'rgba(255,255,255,0.4)',
+              fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em',
+            }}>
+              GUIDE {accessMode ? 'ON' : 'OFF'}
+            </span>
+          </button>
+          {/* Status pill */}
+          <div style={{
+            background: 'rgba(0,0,0,0.75)', border: `1.5px solid ${statusColor}`,
+            borderRadius: '20px', padding: '5px 11px', backdropFilter: 'blur(8px)',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: statusColor, boxShadow: `0 0 6px ${statusColor}` }} />
+            <span style={{ color: statusColor, fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em' }}>
+              {statusLabel}
+            </span>
+          </div>
         </div>
       </div>
 
